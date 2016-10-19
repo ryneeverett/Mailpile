@@ -1,0 +1,13 @@
+version: '2'
+services:
+    mailpile:
+        build: .
+        ports:
+            - "127.0.0.1:33411:33411"
+        volumes:
+            - ./:/Mailpile
+            - data:/mailpile-data
+        tty: true
+        command: ./mp
+volumes:
+    data:

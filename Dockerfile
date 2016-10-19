@@ -29,7 +29,3 @@ RUN ./mp setup
 # Entrypoint
 CMD ./mp --www=0.0.0.0:33411 --wait
 EXPOSE 33411
-
-# Volumes
-VOLUME /mailpile-data/.local/share/Mailpile
-VOLUME /mailpile-data/.gnupg
