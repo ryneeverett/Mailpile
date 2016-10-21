@@ -8,6 +8,6 @@ services:
             - ./:/Mailpile
             - data:/mailpile-data
         tty: true
-        command: ./mp
+        entrypoint: ./mp
 volumes:
     data:
