@@ -635,16 +635,11 @@ class PluginManager(object):
     VCARD_EXPORTERS = {}
     VCARD_CONTEXT_PROVIDERS = {}
 
-    def _reg_vcard_plugin(self, what, cfg_sect, plugin_classes, cls, dct):
+    def _reg_vcard_plugin(self, what, cfg_sect, plugin_classes):
         for plugin_class in plugin_classes:
             if not plugin_class.SHORT_NAME or not plugin_class.FORMAT_NAME:
                 raise PluginError("Please set SHORT_NAME "
                                   "and FORMAT_* attributes!")
-            if not issubclass(plugin_class, cls):
-                raise PluginError("%s must be a %s" % (what, cls))
-            if plugin_class.SHORT_NAME in dct:
-                raise PluginError("%s for %s already registered"
-                                  % (what, importer.FORMAT_NAME))
 
             if plugin_class.CONFIG_RULES:
                 rules = {
@@ -656,25 +651,24 @@ class PluginManager(object):
                     'prefs', 'vcard', cfg_sect, plugin_class.SHORT_NAME,
                     [plugin_class.FORMAT_DESCRIPTION, rules, []])
 
-            dct[plugin_class.SHORT_NAME] = plugin_class
+            for hook in plugin_class.HOOKS:
+                dct = getattr(self, hook)
+                if plugin_class.SHORT_NAME in dct:
+                    raise PluginError("%s for %s already registered"
+                                      % (what, plugin_class.FORMAT_NAME))
+                dct[plugin_class.SHORT_NAME] = plugin_class
 
     def register_vcard_importers(self, *importers):
         self._compat_check()
-        self._reg_vcard_plugin('Importer', 'importers', importers,
-                               mailpile.vcard.VCardImporter,
-                               self.VCARD_IMPORTERS)
+        self._reg_vcard_plugin('Importer', 'importers', importers)
 
     def register_contact_exporters(self, *exporters):
         self._compat_check()
-        self._reg_vcard_plugin('Exporter', 'exporters', exporters,
-                               mailpile.vcard.VCardExporter,
-                               self.VCARD_EXPORTERS)
+        self._reg_vcard_plugin('Exporter', 'exporters', exporters)
 
     def register_contact_context_providers(self, *providers):
         self._compat_check()
-        self._reg_vcard_plugin('Context provider', 'context', providers,
-                               mailpile.vcard.VCardContextProvider,
-                               self.VCARD_CONTEXT_PROVIDERS)
+        self._reg_vcard_plugin('Context provider', 'context', providers)
 
 
     ##[ Pluggable cron jobs ]#################################################
@@ -755,7 +749,7 @@ class PluginManager(object):
     def register_ui_element(self, ui_type,
                             context=None, name=None,
                             text=None, icon=None, description=None,
-                            url=None, javascript_setup=None, 
+                            url=None, javascript_setup=None,
                             javascript_events=None, **kwargs):
         name = name.replace('/', '_')
         if name not in [e.get('name') for e in self.UI_ELEMENTS[ui_type]]:
@@ -781,6 +775,15 @@ class PluginManager(object):
         #        The good thing is, it maintains a stable order.
         return [elem for elem in self.UI_ELEMENTS[ui_type]
                 if context in elem['context']]
+
+    ##[ Pluggable Hooks ]####################################################
+
+    INCOMING_EMAIL = {}
+
+    @staticmethod
+    def trigger(hook, **kwargs):
+        for func in hook.values():
+            func(**kwargs)
 
 
 ##[ Backwards compatibility ]################################################
