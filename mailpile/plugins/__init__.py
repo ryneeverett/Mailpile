@@ -637,9 +637,11 @@ class PluginManager(object):
 
     def _reg_vcard_plugin(self, what, cfg_sect, plugin_classes):
         for plugin_class in plugin_classes:
-            if not plugin_class.SHORT_NAME or not plugin_class.FORMAT_NAME:
-                raise PluginError("Please set SHORT_NAME "
-                                  "and FORMAT_* attributes!")
+            for attr in ('SHORT_NAME', 'FORMAT_NAME', 'HOOKS'):
+                if getattr(plugin_class, attr, None) is None:
+                    raise PluginError(
+                        "{plugin_class} is missing '{attr}' attribute!".format(
+                            plugin_class=plugin_class, attr=attr))
 
             if plugin_class.CONFIG_RULES:
                 rules = {
@@ -775,15 +777,6 @@ class PluginManager(object):
         #        The good thing is, it maintains a stable order.
         return [elem for elem in self.UI_ELEMENTS[ui_type]
                 if context in elem['context']]
-
-    ##[ Pluggable Hooks ]####################################################
-
-    INCOMING_EMAIL = {}
-
-    @staticmethod
-    def trigger(hook, **kwargs):
-        for func in hook.values():
-            func(**kwargs)
 
 
 ##[ Backwards compatibility ]################################################
