@@ -39,7 +39,7 @@ class FaceImporter(VCardImporter):
                 warnings.warn(
                     email + "'s face header exceeds the maximum size. "
                     "See the spec: http://quimby.gnus.org/circus/face/")
-                return
+                return []
 
             vcard = MailpileVCard(
                 VCardLine(name=self.VCARD_TS, value=int(time.time())),
@@ -53,6 +53,9 @@ class FaceImporter(VCardImporter):
                 if config:
                     self.config = config
                     self.merge_or_create_vcard(session, session.config.vcards, vcard)
+
+        # Return no keywords.
+        return []
 
 
 _plugins.register_vcard_importers(FaceImporter())
