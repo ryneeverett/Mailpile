@@ -14,7 +14,7 @@ class FaceImporter(VCardImporter):
     """
     Get avatar from Face header.
     """
-    HOOKS = ['INCOMING_EMAIL']
+    HOOKS = ['META_KW_EXTRACTORS']
     FORMAT_NAME = 'Face'
     FORMAT_DESCRIPTION = _('Get avatar from Face header.')
     SHORT_NAME = 'face'
@@ -27,9 +27,8 @@ class FaceImporter(VCardImporter):
     def __init__(self):
         pass
 
-    def __call__(self, **kwargs):
-        session = kwargs['session']
-        message = kwargs['message']
+    def __call__(
+            self, msg_mid, message, msg_size, msg_ts, session=None, **kwargs):
         email = safe_decode_hdr(msg=message, name='from')
         configs = session.config.prefs.vcard.importers[self.SHORT_NAME]
 
