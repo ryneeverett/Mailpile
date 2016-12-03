@@ -28,7 +28,8 @@ class FaceImporter(VCardImporter):
         pass
 
     def __call__(
-            self, msg_mid, message, msg_size, msg_ts, session=None, **kwargs):
+            self, mail_idx, msg_mid, message, msg_size, msg_ts,
+            session=None, **kwargs):
         email = safe_decode_hdr(msg=message, name='from')
         configs = session.config.prefs.vcard.importers[self.SHORT_NAME]
 
