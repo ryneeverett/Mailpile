@@ -214,8 +214,8 @@ class SearchResults(dict):
 
     _BAR = u'\u2502'
     _FORK = u'\u251c'
-    _FIRST = u'\u256d'
-    _LAST = u'\u2570'
+    _FIRST = u'\u250c'
+    _LAST = u'\u2514'
     _BLANK = u' '
     _DASH = u'\u2500'
     _TEE = u'\u252c'
@@ -741,7 +741,7 @@ class Search(Command):
     def _email_view_side_effects(self, emails):
         session, config, idx = self.session, self.session.config, self._idx()
         msg_idxs = [e.msg_idx_pos for e in emails]
-        if 'tags' in config:
+        if 'tags' in config and config.prefs.auto_mark_as_read:
             for tag in config.get_tags(type='unread'):
                 idx.remove_tag(session, tag._key, msg_idxs=msg_idxs)
             for tag in config.get_tags(type='read'):
@@ -842,7 +842,7 @@ class Search(Command):
         return session, idx
 
     def cache_id(self, *args, **kwargs):
-        if self._emails:
+        if self._emails or self.session.search_index:
             return ''
         return Command.cache_id(self, *args, **kwargs)
 
