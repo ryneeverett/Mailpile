@@ -1,5 +1,5 @@
 _mp() {
-    docker-compose -f .docker-compose.yml run --service-ports mailpile "$@"
+    docker-compose run --service-ports mailpile "$@"
 }
 
 mp() {
