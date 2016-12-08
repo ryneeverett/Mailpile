@@ -1,11 +1,11 @@
 _mp() {
-    docker-compose -f .docker-compose.yml run --rm --service-ports mailpile "$@"
+    docker-compose -f .docker-compose.yml run --service-ports mailpile "$@"
 }
 
 mp() {
     if [ "$1" = "setup" ]; then
         shift
-        docker volume rm mailpile_data
+        docker-compose down
         if [ "$?" != 0 ]; then
             return "$?"
         fi
