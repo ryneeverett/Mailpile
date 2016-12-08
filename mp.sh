@@ -5,7 +5,7 @@ _mp() {
 mp() {
     if [ "$1" = "setup" ]; then
         shift
-        docker-compose down
+        docker-compose down --volumes
         if [ "$?" != 0 ]; then
             return "$?"
         fi
